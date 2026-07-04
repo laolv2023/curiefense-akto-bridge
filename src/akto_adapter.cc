@@ -15,6 +15,7 @@
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <cctype>
+#include <cstdio>
 
 namespace curiefense {
 

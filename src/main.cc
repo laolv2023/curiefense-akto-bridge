@@ -159,8 +159,8 @@ int main(int argc, char* argv[]) {
             cfg.alert_guard.rate_limit_per_minute,
             cfg.alert_guard.filter_low_severity);
 
-        // 4. 初始化 Kafka Producer
-        RdKafka::Producer* producer = createProducer(cfg.producer);
+        // 4. 初始化 Kafka Producer (RAII: unique_ptr 确保异常安全)
+        auto producer = std::unique_ptr<RdKafka::Producer>(createProducer(cfg.producer));
 
         // 设置告警输出回调
         pool.setAlertCallback(
@@ -177,14 +177,14 @@ int main(int argc, char* argv[]) {
                 }
             });
 
-        // 5. 初始化 Kafka Consumer
-        RdKafka::KafkaConsumer* consumer = createConsumer(cfg.consumer);
+        // 5. 初始化 Kafka Consumer (RAII)
+        auto consumer = std::unique_ptr<RdKafka::KafkaConsumer>(createConsumer(cfg.consumer));
         std::vector<std::string> topics = {cfg.consumer.topic};
         RdKafka::ErrorCode err = consumer->subscribe(topics);
         if (err != RdKafka::ERR_NO_ERROR) {
             SPDLOG_ERROR("Failed to subscribe to {}: {}", cfg.consumer.topic,
                          RdKafka::err2str(err));
-            return 1;
+            return 1;  // consumer/producer 由 unique_ptr 自动释放
         }
 
         SPDLOG_INFO("Subscribed to topic: {}", cfg.consumer.topic);
@@ -222,14 +222,14 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        // 8. 优雅关闭
+        // 8. 优雅关闭 (consumer/producer 由 unique_ptr 自动释放)
         SPDLOG_INFO("Shutting down...");
         pool.stop();
         consumer->close();
-        delete consumer;
+        // consumer unique_ptr 析构时自动 delete
 
         producer->flush(30'000);
-        delete producer;
+        // producer unique_ptr 析构时自动 delete
 
         SPDLOG_INFO("Curiefense-Akto Bridge stopped");
         return 0;

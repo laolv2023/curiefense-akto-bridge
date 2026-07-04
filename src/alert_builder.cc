@@ -12,6 +12,7 @@
 #include "malicious_event.pb.h"
 #include <sstream>
 #include <iomanip>
+#include <cstdio>
 #include <simdjson.h>
 #include <spdlog/spdlog.h>
 #include <chrono>
@@ -110,14 +111,6 @@ std::string AlertBuilder::mapSubCategory(const std::string& reasons_json) {
         }
     } catch (...) {}
     return "SecurityMisconfiguration"; // GlobalFilter 兜底
-}
-
-// ============================================================================
-// mapSeverity (保留用于向后兼容)
-// ============================================================================
-
-std::string AlertBuilder::mapSeverity(const AnalyzeResult& result) {
-    return mapSeverityFromCuriefense(result);
 }
 
 // ============================================================================

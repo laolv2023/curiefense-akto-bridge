@@ -19,7 +19,6 @@ public:
 
 private:
     static std::string mapSubCategory(const std::string& reasons_json);
-    static std::string mapSeverity(const AnalyzeResult& result);
     static std::string generateFilterId(const std::string& reasons_json);
     /// @brief Curiefense 严重级别映射
     /// 与 WGE mapSeverityToAkto 不同: WGE 用 syslog 0-7，Curiefense 用 blocked/monitored
