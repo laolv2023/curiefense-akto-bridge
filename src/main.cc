@@ -6,7 +6,6 @@
  */
 
 #include "config.h"
-#include "config_loader.cc"  // 包含实现 (简化构建)
 #include "engine.h"
 #include "akto_adapter.h"
 #include "alert_builder.h"

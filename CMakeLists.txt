@@ -63,6 +63,7 @@ set(CORE_SOURCES
     src/engine.cc
     src/alert_builder.cc
     src/worker_pool.cc
+    src/config_loader.cc
 )
 
 add_library(curiefense_bridge_core STATIC ${CORE_SOURCES} ${PROTO_SRCS})

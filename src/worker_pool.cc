@@ -200,8 +200,7 @@ void CuriefenseWorkerPool::workerLoop(int worker_id) {
 // ============================================================================
 
 bool CuriefenseWorkerPool::shouldSendAlert(const AnalyzeResult& result, AktoLog& log) {
-    // 功能1: 告警分级过滤 — 丢弃 LOW 级别
-    std::string severity = AlertBuilder::build(result, log).empty() ? "" : "HIGH";
+    // 功能1: 告警分级过滤 — 丢弃非 blocked/monitored 的告警
     if (filter_low_severity_) {
         if (!result.blocked && !result.monitored) {
             SPDLOG_DEBUG("[worker_pool] Dropping non-blocked/non-monitored alert");

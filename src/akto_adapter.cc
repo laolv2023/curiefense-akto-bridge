@@ -105,7 +105,7 @@ AktoLog AktoAdapter::adapt(const char* payload, size_t len,
             ? parseProto(reinterpret_cast<const uint8_t*>(payload), len)
             : parseJson(reinterpret_cast<const uint8_t*>(payload), len);
     } catch (const std::exception& e) {
-        spdlog::warn("AktoAdapter parse failed: {}", e.what());
+        SPDLOG_WARN("AktoAdapter parse failed: {}", e.what());
         log.ip = "0.0.0.0";
         log.method = "GET";
         log.path = "/";

@@ -82,4 +82,10 @@ struct BridgeConfig {
     } wal;
 };
 
+/// @brief 从 YAML 文件加载配置
+/// @param path 配置文件路径
+/// @return BridgeConfig 配置结构体
+/// @throws std::runtime_error 如果配置文件不存在或格式错误
+BridgeConfig loadConfig(const std::string& path);
+
 } // namespace curiefense

@@ -4,7 +4,6 @@
  */
 
 #include "config.h"
-#include "engine.h"
 #include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>
 #include <regex>
@@ -155,7 +154,7 @@ BridgeConfig loadConfig(const std::string& path) {
                     int32_t col_id = kv.second.as<int32_t>();
                     cfg.alert_guard.host_collection_map[host] = col_id;
                 } catch (const YAML::BadConversion& e) {
-                    spdlog::warn("config_loader: skipping invalid host_collection_map entry: {}", e.what());
+                    SPDLOG_WARN("config_loader: skipping invalid host_collection_map entry: {}", e.what());
                 }
             }
         }
@@ -177,7 +176,7 @@ BridgeConfig loadConfig(const std::string& path) {
         cfg.wal.segment_max_size = getInt(wal, "segment_max_size", 256 * 1024 * 1024);
     }
 
-    spdlog::info("Config loaded from {}: consumer_topic={}, producer_topic={}, "
+    SPDLOG_INFO("Config loaded from {}: consumer_topic={}, producer_topic={}, "
                  "worker_threads={}, host_map_entries={}",
                  path, cfg.consumer.topic, cfg.producer.topic,
                  cfg.detector.worker_threads,
