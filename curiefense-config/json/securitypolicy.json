@@ -1,0 +1,37 @@
+{
+  "version": "1.0",
+  "securitypolicies": {
+    "default": {
+      "name": "default",
+      "filter_rules": {
+        "name": "default-rules"
+      },
+      "acl": {
+        "name": "default-acl"
+      }
+    }
+  },
+  "contentfilter-rules": {
+    "name": "default-rules",
+    "rules": [
+      {
+        "id": "sqli-basic",
+        "description": "Basic SQL Injection detection",
+        "risk_level": 3,
+        "match": {
+          "operator": "contains",
+          "value": "' OR 1=1"
+        }
+      },
+      {
+        "id": "xss-basic",
+        "description": "Basic XSS detection",
+        "risk_level": 3,
+        "match": {
+          "operator": "contains",
+          "value": "<script>"
+        }
+      }
+    ]
+  }
+}

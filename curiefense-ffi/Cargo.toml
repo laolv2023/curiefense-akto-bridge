@@ -1,0 +1,18 @@
+[package]
+name = "curiefense-ffi"
+version = "0.1.0"
+edition = "2021"
+description = "C FFI bindings for Curiefense WAF engine"
+
+[lib]
+name = "curiefense_ffi"
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+curiefense = { git = "https://github.com/curiefense/curiefense.git" }
+serde_json = "1.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+panic = "abort"

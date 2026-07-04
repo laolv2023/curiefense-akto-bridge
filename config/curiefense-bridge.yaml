@@ -1,0 +1,60 @@
+# curiefense-bridge.yaml — Curiefense-Akto Bridge 主配置
+
+kafka:
+  consumer:
+    bootstrap_servers: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
+    group_id: "curiefense-bridge"
+    topic: "${AKTO_INPUT_TOPIC:-akto.api.logs2}"
+    input_format: "${AKTO_INPUT_FORMAT:-auto}"   # auto | json | protobuf
+    auto_offset_reset: "latest"
+    enable_auto_commit: false
+    max_poll_records: 100
+    session_timeout_ms: 30000
+    # SASL
+    security_protocol: "${KAFKA_SECURITY_PROTOCOL:-}"
+    sasl_mechanism: "${KAFKA_SASL_MECHANISM:-SCRAM-SHA-512}"
+    sasl_username: "${KAFKA_SASL_USERNAME:-}"
+    sasl_password: "${KAFKA_SASL_PASSWORD:-}"
+
+  producer:
+    bootstrap_servers: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
+    topic: "akto.threat_detection.malicious_events"
+    dlq_topic: "curiefense-input-dlq"
+    enable_idempotence: true
+    batch_size: 65536
+    linger_ms: 20
+    retries: 3
+    # SASL (同 consumer)
+    security_protocol: "${KAFKA_SECURITY_PROTOCOL:-}"
+    sasl_mechanism: "${KAFKA_SASL_MECHANISM:-SCRAM-SHA-512}"
+    sasl_username: "${KAFKA_SASL_USERNAME:-}"
+    sasl_password: "${KAFKA_SASL_PASSWORD:-}"
+
+curiefense:
+  config_dir: "/etc/curiefense/config"
+  enable_rate_limit: false   # 禁用 Rate Limit (避免 Redis 依赖)
+
+detector:
+  worker_threads: 0          # 0 = auto (hardware_concurrency)
+  batch_size: 100
+  max_pending_tasks: 2000
+  task_timeout_ms: 5000
+  poll_interval_ms: 100
+
+# 告警保护 (审计修正 v3.2: 与 WGE shouldSendAlert 对齐)
+alert_guard:
+  filter_low_severity: true                 # 丢弃 LOW/RateLimit 级别告警
+  rate_limit_per_minute: 5                  # IP+Account+Category 每分钟最大告警数
+  host_collection_map:
+    "api.example.com": 1
+    "admin.example.com": 2
+
+observability:
+  log_level: "info"          # trace|debug|info|warn|error
+  log_format: "json"         # json | text
+  prometheus_enabled: true
+  prometheus_port: 9101
+
+wal:
+  dir: "/var/lib/curiefense-bridge/wal"
+  segment_max_size: 268435456   # 256 MB

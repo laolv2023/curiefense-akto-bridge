@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  curiefense-bridge:
+    build: .
+    image: curiefense-akto-bridge:latest
+    container_name: curiefense-bridge
+    restart: always
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
+      AKTO_INPUT_TOPIC: "${AKTO_INPUT_TOPIC:-akto.api.logs2}"
+      AKTO_INPUT_FORMAT: "auto"
+      KAFKA_SASL_USERNAME: "${KAFKA_SASL_USERNAME:-}"
+      KAFKA_SASL_PASSWORD: "${KAFKA_SASL_PASSWORD:-}"
+    volumes:
+      - ./config/curiefense-bridge.yaml:/etc/curiefense-bridge/curiefense-bridge.yaml:ro
+      - ./curiefense-config:/etc/curiefense/config:ro
+      - curiefense-wal:/var/lib/curiefense-bridge/wal
+    ports:
+      - "9101:9101"
+    depends_on:
+      - kafka
+    networks:
+      - akto-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - akto-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - akto-network
+
+volumes:
+  curiefense-wal:
+
+networks:
+  akto-network:
+    driver: bridge
