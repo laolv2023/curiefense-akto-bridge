@@ -86,10 +86,17 @@ public:
 
     size_t pendingCount() const;
 
+    /// @brief 告警输出回调类型
+    /// @param payload Protobuf 序列化后的 MaliciousEventKafkaEnvelope
+    /// @param key 消息 key (用于 Kafka 分区)
+    using AlertCallback = std::function<void(const std::string& payload, const std::string& key)>;
+
+    /// @brief 设置告警输出回调 (在 start() 前调用)
+    void setAlertCallback(AlertCallback cb) { alert_callback_ = std::move(cb); }
+
 private:
     void workerLoop(int worker_id);
     bool shouldSendAlert(const AnalyzeResult& result, AktoLog& log);
-    std::string extractHostFromHeaders(const std::string& headers_json);
 
     CuriefenseEngine& engine_;
     AktoAdapter& adapter_;
@@ -113,14 +120,7 @@ private:
     std::deque<DetectTask> task_queue_;
     int max_pending_tasks_{2000};
 
-    // 告警输出回调 (由 main.cc 设置)
-public:
-    /// @brief 告警输出回调类型
-    /// @param payload Protobuf 序列化后的 MaliciousEventKafkaEnvelope
-    /// @param key 消息 key (用于 Kafka 分区)
-    using AlertCallback = std::function<void(const std::string& payload, const std::string& key)>;
-    void setAlertCallback(AlertCallback cb) { alert_callback_ = std::move(cb); }
-private:
+    // 告警输出回调
     AlertCallback alert_callback_;
 };
 

@@ -7,13 +7,12 @@
  * 支持 JSON (akto.api.logs) 和 Protobuf (akto.api.logs2) 双模自动识别。
  */
 
+#include "config.h"  // InputFormat 定义在 config.h 中
 #include <cstdint>
 #include <string>
 #include <unordered_map>
 
 namespace curiefense {
-
-enum class InputFormat { Auto, Json, Protobuf };
 
 /// @brief Akto 日志中间结构 (从 Kafka 消息解析)
 struct AktoLog {
